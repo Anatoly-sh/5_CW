@@ -6,14 +6,16 @@ import os
 import dotenv
 from dotenv import load_dotenv
 
+from utils import create_db_and_tables, get_employer, load_db_employees
+
 load_dotenv()
-# if DB_IS_FULL == '1':
+
 menu_options = """
-    1: Заполнить базу данных
-    2: Запросить/обновить данные с сайтов вакансий в локальных файлах
-    3: Посмотреть вакансии в указанном городе
-    4: Вывести 10 самых высокооплачиваемых вакансий
-    5: Запись обрабатываемых вакансий в файл json
+    1: Создать БД и структуру таблиц
+    2: Заполнить базу данных
+    3: 3
+    4: 4
+    5: 5
     6: Завершение программы
 """
 
@@ -25,8 +27,14 @@ def load_db() -> None:
     if os.path.exists(file_name) is False:
         print('Файл не найден')
         return
-    print('OK')
+    with open(file_name) as file:
+        for each_company in file:
+            company_data = get_employer(each_company)
+            print(company_data)
+            load_db_employees(company_data)
 
+    # vacancy_list = get_vacancies('1122462')
+    # load_db_vacancy_param(vacancy_list)
 
 
 def method1():
@@ -49,10 +57,12 @@ if __name__ == '__main__':
             print('Неверный ввод. Пожалуйста введите цифру...')
         # Проверка выбора и действие
         if option == '1':
-            load_db()
+            create_db_and_tables()
         elif option == '2':
-            method1()
+            load_db()
         elif option == '3':
+            method1()
+        elif option == '4':
             method2()
         elif option == '6':
             print('Спасибо за использование программы')

@@ -98,13 +98,13 @@ def get_vacancies(company_id) -> list:
 
 def load_db_employees(company: list) -> None:
     """
-    Функция записывает в БД 5_CW таблицу employees данные из списка,
+    Функция записывает в БД five_cw таблицу employees данные из списка,
     полученного в переданном параметре.
     :param company:
     :return: Ничего не возвращает.
     """
     # connect to db
-    conn = psycopg2.connect(host='localhost', port=5433, database='5_CW', user='postgres', password='12345')
+    conn = psycopg2.connect(host='localhost', port=5433, database='five_cw', user='postgres', password='12345')
     try:
         with conn:
             cur = conn.cursor()
@@ -115,15 +115,16 @@ def load_db_employees(company: list) -> None:
     # for company in companies:
     #     print(company)
 
+
 def load_db_vacancy_param(vacancy: list) -> None:
     """
-    Функция записывает в БД 5_CW таблицу employees данные из списка словарей,
+    Функция записывает в БД five_cw таблицу employees данные из списка словарей,
     полученного в переданном параметре. Каждый словарь - вакансия.
     :param vacancy:
     :return:
     """
     # connect to db
-    conn = psycopg2.connect(host='localhost', port=5433, database='5_CW', user='postgres', password='12345')
+    conn = psycopg2.connect(host='localhost', port=5433, database='five_cw', user='postgres', password='12345')
     try:
         with conn:
             cur = conn.cursor()
@@ -152,9 +153,10 @@ def load_db_vacancy_param(vacancy: list) -> None:
 #
 # vacancy_list = get_vacancies('1122462')
 # load_db_vacancy_param(vacancy_list)
-
-conn = psycopg2.connect(host='localhost', port=5433, database='5_CW', user='postgres', password='12345')
+"""
+conn = psycopg2.connect(host='localhost', port=5433, database='postgres', user='postgres', password='12345')
 try:
+    conn.autocommit = True
     with conn:
         # my_table = psql.read_sql('SELECT * FROM employees', conn)
         cur = conn.cursor()
@@ -162,31 +164,74 @@ try:
     conn.commit()
 finally:
     conn.close()
-# print(my_table)
+"""
 
-# матюк
-# conn = psycopg2.connect(dbname='postgres', host='localhost', user='postgres', password='54321')
-#         conn.autocommit = True
-#         cur = conn.cursor()
-#
-#         cur.execute("DROP DATABASE course_work")
-#         cur.execute("CREATE DATABASE course_work")
-#
-#         cur.close()
-#         conn.close()
+
+def create_db_and_tables() -> None:
+    """
+    Создает новую БД и таблицы. Все имена и параметры внутри кода.
+    :return: None
+    """
+    # Создание БД
+    conn = psycopg2.connect(dbname='postgres', host='localhost', port=5433, user='postgres', password='12345')
+    conn.autocommit = True
+    cur = conn.cursor()
+
+    cur.execute("DROP DATABASE IF EXISTS five_cw")
+    cur.execute("CREATE DATABASE five_cw")
+    print('БД "five_cw" создана')
+
+    cur.close()
+    conn.close()
+    # Создание таблиц
+    conn = psycopg2.connect(host='localhost', port=5433, database='five_cw', user='postgres', password='12345')
+    try:
+        # conn.autocommit = True
+        with conn:
+            # my_table = psql.read_sql('SELECT * FROM employees', conn)
+            cur = conn.cursor()
+            cur.execute("DROP TABLE IF EXISTS employees, vacancy_param")
+
+            cur.execute("""CREATE TABLE employees 
+            (
+            employer_id varchar(30) PRIMARY KEY, 
+            company_name varchar(50), 
+            vacancy_quantity int)
+            """)
+
+            cur.execute("""CREATE TABLE vacancy_param
+            (
+            employer_id varchar(30),
+            FOREIGN KEY (employer_id)
+            REFERENCES employees(employer_id),
+            vacancy_id int UNIQUE,
+            vacancy_name varchar(100),
+            salary_from int NOT NULL,
+            url varchar(100),
+            publicy_date date,
+            area varchar(50),
+            requirement text
+            )""")
+
+        conn.commit()
+    finally:
+        conn.close()
+    print('Таблицы в БД "five_cw" созданы')
+
+
 # рекомендации по .env - там все переменные
 # https://github.com/skypro-008/github_stats_to_postgres/blob/main/src/main.py
 
 
-    # my_table = pd.read_sql('select * from my-table-name', connection)
-    # another_attempt = psql.read_sql("SELECT * FROM my-table-name", connection)
-    # print(my_table)
-    # OR
-    # print(another_attempt)
+# my_table = pd.read_sql('select * from my-table-name', connection)
+# another_attempt = psql.read_sql("SELECT * FROM my-table-name", connection)
+# print(my_table)
+# OR
+# print(another_attempt)
 
-        # print(line.rstrip())
-        # data = get_employer(line)
-        # print(data)
+# print(line.rstrip())
+# data = get_employer(line)
+# print(data)
 
 # company_id = '6093775'
 # req = requests.get(f'https://api.hh.ru/vacancies/', params={
@@ -200,7 +245,6 @@ finally:
 #
 # req.close()
 # print(count_of_pages)
-
 
 
 # data = get_vacancies(company_name)
