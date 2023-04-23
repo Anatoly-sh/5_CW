@@ -1,6 +1,7 @@
 import json
 import time
 from pprint import pprint
+from typing import Any
 
 import pandas as pandas
 import pandas.io.sql as psql
@@ -98,19 +99,20 @@ def get_vacancies(company_id) -> list:
     return vacancy_list
 
 
-def load_db_employees(company: list) -> None:
+def load_db_employers(company: list, database: str, **params: dict[Any]) -> None:
     """
-    Функция записывает в БД five_cw таблицу employees данные из списка,
+    Функция записывает в БД five_cw таблицу employers данные из списка,
     полученного в переданном параметре.
+    :param database:
     :param company:
     :return: Ничего не возвращает.
     """
     # connect to db
-    conn = psycopg2.connect(host='localhost', port=5433, database='five_cw', user='postgres', password='12345')
+    conn = psycopg2.connect(dbname=database, **params)
     try:
         with conn:
             cur = conn.cursor()
-            cur.execute("INSERT INTO employees VALUES (%s, %s, %s)", company)
+            cur.execute("INSERT INTO employers VALUES (%s, %s, %s)", company)
         conn.commit()
     finally:
         conn.close()
@@ -118,15 +120,16 @@ def load_db_employees(company: list) -> None:
     #     print(company)
 
 
-def load_db_vacancy_param(vacancy: list) -> None:
+def load_db_vacancy_param(vacancy: list, database: str, **params) -> None:
     """
-    Функция записывает в БД five_cw таблицу employees данные из списка словарей,
+    Функция записывает в БД five_cw таблицу employers данные из списка словарей,
     полученного в переданном параметре. Каждый словарь - вакансия.
+    :param database:
     :param vacancy:
     :return:
     """
     # connect to db
-    conn = psycopg2.connect(host='localhost', port=5433, database='five_cw', user='postgres', password='12345')
+    conn = psycopg2.connect(dbname=database, **params)
     try:
         with conn:
             cur = conn.cursor()
@@ -151,7 +154,7 @@ def load_db_vacancy_param(vacancy: list) -> None:
 #     for each_company in file:
 #         company_data = get_employer(each_company)
 #         print(company_data)
-#         load_db_employees(company_data)
+#         load_db_employers(company_data)
 #
 # vacancy_list = get_vacancies('1122462')
 # load_db_vacancy_param(vacancy_list)
@@ -160,7 +163,7 @@ conn = psycopg2.connect(host='localhost', port=5433, database='postgres', user='
 try:
     conn.autocommit = True
     with conn:
-        # my_table = psql.read_sql('SELECT * FROM employees', conn)
+        # my_table = psql.read_sql('SELECT * FROM employers', conn)
         cur = conn.cursor()
         cur.execute("CREATE DATABASE TMP")
     conn.commit()
@@ -190,10 +193,10 @@ def create_db_and_tables(database: str, params: dict) -> None:
     try:
         # conn.autocommit = True
         with conn.cursor() as cur:
-            cur.execute("DROP TABLE IF EXISTS employees, vacancy_param")
+            cur.execute("DROP TABLE IF EXISTS employers, vacancy_param")
 
             cur.execute("""
-            CREATE TABLE employees (
+            CREATE TABLE employers (
                 employer_id varchar(30) PRIMARY KEY, 
                 company_name varchar(50), 
                 vacancy_quantity int
@@ -204,7 +207,7 @@ def create_db_and_tables(database: str, params: dict) -> None:
             CREATE TABLE vacancy_param (
                 employer_id varchar(30),
                 FOREIGN KEY (employer_id)
-                REFERENCES employees(employer_id),
+                REFERENCES employers(employer_id),
                 vacancy_id int UNIQUE,
                 vacancy_name varchar(100),
                 salary_from int NOT NULL,
@@ -249,7 +252,7 @@ def create_db_and_tables(database: str, params: dict) -> None:
 
 
 # data = get_vacancies(company_name)
-# load_db_employees(data)
+# load_db_employers(data)
 # with open('./HH_vacancies_.json', 'w') as file:
 #     json.dump(data, file, indent=2, ensure_ascii=False)
 
