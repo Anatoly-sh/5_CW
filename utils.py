@@ -75,7 +75,7 @@ def get_vacancies(company_id) -> list:
     """
     req = requests.get(f'https://api.hh.ru/vacancies/', params={
         'employer_id': f'{company_id}',
-        'text': '',
+        'text': 'разработка',
         'only_with_vacancies': True,
         'only_with_salary': True
     })
@@ -85,7 +85,7 @@ def get_vacancies(company_id) -> list:
     for page in range(count_of_pages):
         req = requests.get('https://api.hh.ru/vacancies/', params={
             'employer_id': f'{company_id}',
-            'text': '',
+            'text': 'разработка',
             'only_with_vacancies': True,
             'only_with_salary': True,
             'page': f'{page}'
@@ -93,6 +93,7 @@ def get_vacancies(company_id) -> list:
         page_data = req.json()
         req.close()
         vacancy_list.extend(page_data['items'])
+        time.sleep(0.2)
     return vacancy_list
 
 

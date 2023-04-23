@@ -6,7 +6,7 @@ import os
 import dotenv
 from dotenv import load_dotenv
 
-from utils import create_db_and_tables, get_employer, load_db_employees
+from utils import create_db_and_tables, get_employer, load_db_employees, get_vacancies, load_db_vacancy_param
 
 load_dotenv()
 
@@ -32,6 +32,9 @@ def load_db() -> None:
             company_data = get_employer(each_company)
             print(company_data)
             load_db_employees(company_data)
+            vacancy_list = get_vacancies(company_data[0])
+            load_db_vacancy_param(vacancy_list)
+
 
     # vacancy_list = get_vacancies('1122462')
     # load_db_vacancy_param(vacancy_list)
