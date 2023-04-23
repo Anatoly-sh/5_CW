@@ -7,6 +7,7 @@ import pandas.io.sql as psql
 import psycopg2
 import requests
 
+
 """
 response = requests.get(url='https://api.hh.ru/employers/' + '1')
 # response = requests.get(url='https://api.hh.ru/employers/', params={'open_vacancies': True, 'text': 'VK'})
@@ -168,56 +169,55 @@ finally:
 """
 
 
-def create_db_and_tables() -> None:
+def create_db_and_tables(database: str, params: dict) -> None:
     """
     Создает новую БД и таблицы. Все имена и параметры внутри кода.
     :return: None
     """
     # Создание БД
-    conn = psycopg2.connect(dbname='postgres', host='localhost', port=5433, user='postgres', password='12345')
+    conn = psycopg2.connect(dbname='postgres', **params)
     conn.autocommit = True
     cur = conn.cursor()
 
-    cur.execute("DROP DATABASE IF EXISTS five_cw")
-    cur.execute("CREATE DATABASE five_cw")
+    cur.execute(f"DROP DATABASE IF EXISTS {database}")
+    cur.execute(f"CREATE DATABASE {database}")
     print('БД "five_cw" создана')
-
     cur.close()
     conn.close()
+
     # Создание таблиц
-    conn = psycopg2.connect(host='localhost', port=5433, database='five_cw', user='postgres', password='12345')
+    conn = psycopg2.connect(dbname=database, **params)
     try:
         # conn.autocommit = True
-        with conn:
-            # my_table = psql.read_sql('SELECT * FROM employees', conn)
-            cur = conn.cursor()
+        with conn.cursor() as cur:
             cur.execute("DROP TABLE IF EXISTS employees, vacancy_param")
 
-            cur.execute("""CREATE TABLE employees 
-            (
-            employer_id varchar(30) PRIMARY KEY, 
-            company_name varchar(50), 
-            vacancy_quantity int)
+            cur.execute("""
+            CREATE TABLE employees (
+                employer_id varchar(30) PRIMARY KEY, 
+                company_name varchar(50), 
+                vacancy_quantity int
+            )
             """)
 
-            cur.execute("""CREATE TABLE vacancy_param
-            (
-            employer_id varchar(30),
-            FOREIGN KEY (employer_id)
-            REFERENCES employees(employer_id),
-            vacancy_id int UNIQUE,
-            vacancy_name varchar(100),
-            salary_from int NOT NULL,
-            url varchar(100),
-            publicy_date date,
-            area varchar(50),
-            requirement text
-            )""")
-
+            cur.execute("""
+            CREATE TABLE vacancy_param (
+                employer_id varchar(30),
+                FOREIGN KEY (employer_id)
+                REFERENCES employees(employer_id),
+                vacancy_id int UNIQUE,
+                vacancy_name varchar(100),
+                salary_from int NOT NULL,
+                url varchar(100),
+                publicy_date date,
+                area varchar(50),
+                requirement text
+            )
+        """)
         conn.commit()
     finally:
         conn.close()
-    print('Таблицы в БД "five_cw" созданы')
+    print(f'Таблицы в БД "five_cw" созданы')
 
 
 # рекомендации по .env - там все переменные
