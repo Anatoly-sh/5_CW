@@ -256,22 +256,3 @@ def create_db_and_tables(database: str, params: dict) -> None:
 # with open('./HH_vacancies_.json', 'w') as file:
 #     json.dump(data, file, indent=2, ensure_ascii=False)
 
-'''
-"published_at"
-"salary"["from"]    null[null]
-"alternate_url"
-"id"
-"area"["name"]
-
-  "found": 232,
-  "pages": 12,
-  "per_page": 20,
-  "page": 0,
-
-  "found": 2,
-  "pages": 1,
-  "per_page": 20,
-  "page": 0,
-
-
-'''

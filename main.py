@@ -3,10 +3,7 @@
 Программа выполняет запрос вакансий
 """
 import os
-from pprint import pprint
 
-import dotenv
-from dotenv import load_dotenv
 
 from config import config
 from db_manager import DBManager
@@ -14,8 +11,6 @@ from utils import get_employer, load_db_employers, get_vacancies, load_db_vacanc
 
 
 def main():
-    # global params
-    # load_dotenv()
     params = config()
     database = 'five_cw'
     db_ack = DBManager(database, params)
@@ -81,18 +76,6 @@ def load_db(database, params: dict) -> None:
             load_db_employers(company_data, database, **params)                 #
             vacancy_list = get_vacancies(company_data[0])
             load_db_vacancy_param(vacancy_list, database, **params)             #
-
-
-    # vacancy_list = get_vacancies('1122462')
-    # load_db_vacancy_param(vacancy_list)
-
-
-def method1():
-    pass
-
-
-def method2():
-    pass
 
 
 if __name__ == '__main__':

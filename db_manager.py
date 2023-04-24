@@ -90,9 +90,3 @@ class DBManager:
             ORDER BY vacancy_name
             """)
         return answer
-
-"""
-SELECT vacancy_name FROM vacancy_param
-WHERE vacancy_name LIKE '{keyword}' 
-ORDER BY vacancy_name;
-"""
