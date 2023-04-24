@@ -2,28 +2,16 @@ import json
 import time
 from pprint import pprint
 from typing import Any
-
-import pandas as pandas
-import pandas.io.sql as psql
 import psycopg2
 import requests
 
 
-"""
-response = requests.get(url='https://api.hh.ru/employers/' + '1')
-# response = requests.get(url='https://api.hh.ru/employers/', params={'open_vacancies': True, 'text': 'VK'})
-data = response.content.decode()
-# print(response)
-# data_ = response.json()
-with open('./111.json', 'w') as file:
-    pprint(data)
-    print(len(data))
-    json.dump(data, file, indent=2, ensure_ascii=False)
-
-"""
-
-
-def get_employers():
+def get_employers() -> list:
+    """
+    Формирует список работодателей перебором всех ID HeadHunter
+    с ключевым словом 'разработка' и с открытыми вакансиями.
+    :return: Список вакансий
+    """
     req = requests.get('https://api.hh.ru/employers', params={'text': 'разработка', 'only_with_vacancies': True})
     data = req.content.decode()
     req.close()
@@ -150,28 +138,6 @@ def load_db_vacancy_param(vacancy: list, database: str, **params) -> None:
         conn.close()
 
 
-# with open('./company.txt') as file:
-#     for each_company in file:
-#         company_data = get_employer(each_company)
-#         print(company_data)
-#         load_db_employers(company_data)
-#
-# vacancy_list = get_vacancies('1122462')
-# load_db_vacancy_param(vacancy_list)
-"""
-conn = psycopg2.connect(host='localhost', port=5433, database='postgres', user='postgres', password='12345')
-try:
-    conn.autocommit = True
-    with conn:
-        # my_table = psql.read_sql('SELECT * FROM employers', conn)
-        cur = conn.cursor()
-        cur.execute("CREATE DATABASE TMP")
-    conn.commit()
-finally:
-    conn.close()
-"""
-
-
 def create_db_and_tables(database: str, params: dict) -> None:
     """
     Создает новую БД и таблицы. Все имена и параметры внутри кода.
@@ -221,38 +187,3 @@ def create_db_and_tables(database: str, params: dict) -> None:
     finally:
         conn.close()
     print(f'Таблицы в БД "five_cw" созданы')
-
-
-# рекомендации по .env - там все переменные
-# https://github.com/skypro-008/github_stats_to_postgres/blob/main/src/main.py
-
-
-# my_table = pd.read_sql('select * from my-table-name', connection)
-# another_attempt = psql.read_sql("SELECT * FROM my-table-name", connection)
-# print(my_table)
-# OR
-# print(another_attempt)
-
-# print(line.rstrip())
-# data = get_employer(line)
-# print(data)
-
-# company_id = '6093775'
-# req = requests.get(f'https://api.hh.ru/vacancies/', params={
-#     'employer_id': f'{company_id}',
-#     'text': 'программист',
-#     'only_with_vacancies': True,
-#     'only_with_salary': True
-# })
-# data = req.json()
-# count_of_pages = data['pages']  # Узнаем количество страниц вакансий
-#
-# req.close()
-# print(count_of_pages)
-
-
-# data = get_vacancies(company_name)
-# load_db_employers(data)
-# with open('./HH_vacancies_.json', 'w') as file:
-#     json.dump(data, file, indent=2, ensure_ascii=False)
-
