@@ -54,7 +54,8 @@ def main():
             for i in answer:
                 print(i)
         elif option == '7':
-            answer = db_ack.get_vacancies_with_keyword('Python')
+            key_word = input('Введите ключевое слово: ')
+            answer = db_ack.get_vacancies_with_keyword(key_word)
             for i in answer:
                 print(i)
         elif option == '8':
