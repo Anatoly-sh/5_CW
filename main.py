@@ -7,16 +7,17 @@ import os
 
 from config import config
 from db_manager import DBManager
-from utils import get_employer, load_db_employers, get_vacancies, load_db_vacancy_param, create_db_and_tables
+from utils import get_employer, load_db_employers, get_vacancies, load_db_vacancy_param, create_db_and_tables, \
+    get_employers
 
 
 def main():
     params = config()
-    database = 'five_cw'
+    database = config(filename="database.ini", section="user_db")["user_db"]
     db_ack = DBManager(database, params)
     menu_options = """
-        1: Создать БД и структуру таблиц
-        2: Заполнить базу данных
+        1: Фильтр компаний по ключевому слову "разработка"
+        2: Создать БД и структуру таблиц, заполнить базу данных
         3: Список всех компаний с количеством вакансий
         4: Список всех вакансий (компания, вакансия, зарплата, ссылка)
         5: Средняя зарплата по вакансиям
@@ -32,8 +33,9 @@ def main():
             print('Неверный ввод. Пожалуйста введите цифру...')
         # Проверка выбора и действие
         if option == '1':
-            create_db_and_tables(database, params)
+            get_employers()
         elif option == '2':
+            create_db_and_tables(database, params)
             load_db(database, params)
         elif option == '3':
             answer = db_ack.get_companies_and_vacancies_count()
@@ -72,7 +74,7 @@ def load_db(database, params: dict) -> None:
     with open(file_name) as file:
         for each_company in file:
             company_data = get_employer(each_company)
-            print(company_data)
+            print('\n', company_data, end='')
             load_db_employers(company_data, database, **params)                 #
             vacancy_list = get_vacancies(company_data[0])
             load_db_vacancy_param(vacancy_list, database, **params)             #

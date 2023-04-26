@@ -1,6 +1,5 @@
 import json
 import time
-from pprint import pprint
 from typing import Any
 import psycopg2
 import requests
@@ -19,8 +18,8 @@ def get_employers() -> list:
     print(count_of_employers)
     employers = []
     i = 0
-    # j = count_of_employers
-    j = 20
+    j = count_of_employers
+    # j = 20
     while i < j:
         req = requests.get('https://api.hh.ru/employers/' + str(i + 1),
                            params={'text': 'разработка', 'only_with_vacancies': True})
@@ -28,7 +27,7 @@ def get_employers() -> list:
         req.close()
         jsObj = json.loads(data)
         try:
-            if jsObj['open_vacancies'] > 20:
+            if jsObj['open_vacancies'] > 1:
                 employers.append([jsObj['id'], jsObj['name'], jsObj['open_vacancies']])
                 print([jsObj['id'], jsObj['name'], jsObj['open_vacancies']])
             i += 1
@@ -89,7 +88,7 @@ def get_vacancies(company_id) -> list:
 
 def load_db_employers(company: list, database: str, **params: dict[Any]) -> None:
     """
-    Функция записывает в БД five_cw таблицу employers данные из списка,
+    Функция записывает в БД таблицу employers данные из списка,
     полученного в переданном параметре.
     :param database:
     :param company:
@@ -104,13 +103,11 @@ def load_db_employers(company: list, database: str, **params: dict[Any]) -> None
         conn.commit()
     finally:
         conn.close()
-    # for company in companies:
-    #     print(company)
 
 
 def load_db_vacancy_param(vacancy: list, database: str, **params) -> None:
     """
-    Функция записывает в БД five_cw таблицу employers данные из списка словарей,
+    Функция записывает в БД таблицу employers данные из списка словарей,
     полученного в переданном параметре. Каждый словарь - вакансия.
     :param database:
     :param vacancy:
@@ -133,7 +130,8 @@ def load_db_vacancy_param(vacancy: list, database: str, **params) -> None:
                                 vacancy_dict["area"]["name"],
                                 vacancy_dict["snippet"]["requirement"])
                 cur.execute("INSERT INTO vacancy_param VALUES (%s, %s, %s, %s, %s, %s, %s, %s)", vacancy_data)
-                pprint(vacancy_data)
+                # pprint(vacancy_data)
+                print('.', end='')
     finally:
         conn.close()
 
@@ -150,7 +148,7 @@ def create_db_and_tables(database: str, params: dict) -> None:
 
     cur.execute(f"DROP DATABASE IF EXISTS {database}")
     cur.execute(f"CREATE DATABASE {database}")
-    print('БД "five_cw" создана')
+    print(f'БД "{database}" создана')
     cur.close()
     conn.close()
 
@@ -186,4 +184,4 @@ def create_db_and_tables(database: str, params: dict) -> None:
         conn.commit()
     finally:
         conn.close()
-    print(f'Таблицы в БД "five_cw" созданы')
+    print(f'Таблицы в БД "{database}" созданы')
